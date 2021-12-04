@@ -57,12 +57,11 @@
 #define max(a, b) (a > b ? a : b)
 #define min(a, b) (a > b ? b : a)
 
-typedef enum
-{
+enum camera_io_method {
 	IO_METHOD_READ,
 	IO_METHOD_MMAP,
 	IO_METHOD_USERPTR,
-} io_method;
+};
 
 struct buffer
 {
@@ -70,7 +69,7 @@ struct buffer
 	size_t length;
 };
 
-static io_method io = IO_METHOD_MMAP;
+static enum camera_io_method io = IO_METHOD_MMAP;
 struct buffer *buffers = NULL;
 static unsigned int n_buffers = 0;
 
