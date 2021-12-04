@@ -522,7 +522,7 @@ static void init_userp(int fd, char *dev_name, unsigned int buffer_size)
 	}
 }
 
-void camera_init_device(int fd, char *dev_name)
+void camera_init_device(int fd, char *dev_name, enum camera_io_method io_method)
 {
 	struct v4l2_capability cap;
 	struct v4l2_cropcap cropcap;
@@ -531,6 +531,7 @@ void camera_init_device(int fd, char *dev_name)
 	unsigned int min;
 
 
+	io = io_method;
 	generate_YCbCr_to_RGB_lookup();
 
 	if (-1 == xioctl(fd, VIDIOC_QUERYCAP, &cap)) {
@@ -634,12 +635,11 @@ void camera_close_device(int *fd)
 	*fd = -1;
 }
 
-int camera_open_device(char *dev_name, enum camera_io_method io_method)
+int camera_open_device(char *dev_name)
 {
 	struct stat st;
 	int fd;
 
-	io = io_method;
 	if (-1 == stat(dev_name, &st)) {
 		fprintf(stderr, "Cannot identify '%s': %d, %s\n", dev_name, errno, strerror(errno));
 		exit(EXIT_FAILURE);

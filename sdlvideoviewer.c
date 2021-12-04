@@ -153,8 +153,8 @@ int main(int argc, char **argv)
 		}
 	}
 
-	fd = camera_open_device(dev_name, io);
-	camera_init_device(fd, dev_name);
+	fd = camera_open_device(dev_name);
+	camera_init_device(fd, dev_name, io);
 
 	atexit(SDL_Quit);
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
