@@ -338,12 +338,13 @@ void camera_stop_capturing(int fd)
 	}
 }
 
-void camera_start_capturing(int fd, uint8_t *buffer_rgb, void *cookie)
+void camera_start_capturing(int fd, uint8_t *buffer_rgb, camera_render_frame_fn render_fn, void *cookie)
 {
 	unsigned int i;
 	enum v4l2_buf_type type;
 
 	buffer_sdl = buffer_rgb;
+	render = render_fn;
 	render_cookie = cookie;
 	switch (io) {
 	case CAMERA_IO_METHOD_READ:
@@ -633,13 +634,12 @@ void camera_close_device(int *fd)
 	*fd = -1;
 }
 
-int camera_open_device(char *dev_name, enum camera_io_method io_method, camera_render_frame_fn render_fn)
+int camera_open_device(char *dev_name, enum camera_io_method io_method)
 {
 	struct stat st;
 	int fd;
 
 	io = io_method;
-	render = render_fn;
 	if (-1 == stat(dev_name, &st)) {
 		fprintf(stderr, "Cannot identify '%s': %d, %s\n", dev_name, errno, strerror(errno));
 		exit(EXIT_FAILURE);

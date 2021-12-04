@@ -33,9 +33,9 @@ enum camera_io_method {
 
 typedef void (*camera_render_frame_fn)(void *cookie);
 
-int camera_open_device(char *dev_name, enum camera_io_method io_method, camera_render_frame_fn render);
+int camera_open_device(char *dev_name, enum camera_io_method io_method);
 void camera_init_device(int fd, char *dev_name);
-void camera_start_capturing(int fd, uint8_t *buffer_rgb, void *cookie);
+void camera_start_capturing(int fd, uint8_t *buffer_rgb, camera_render_frame_fn render_fn, void *cookie);
 void camera_capture_frame(int fd);
 void camera_stop_capturing(int fd);
 void camera_uninit_device(void);

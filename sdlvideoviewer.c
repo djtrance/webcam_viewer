@@ -153,7 +153,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	fd = camera_open_device(dev_name, io, render);
+	fd = camera_open_device(dev_name, io);
 	camera_init_device(fd, dev_name);
 
 	atexit(SDL_Quit);
@@ -170,7 +170,7 @@ int main(int argc, char **argv)
 
 	SDL_SetEventFilter(sdl_filter);
 
-	camera_start_capturing(fd, buffer_sdl, data_sf);
+	camera_start_capturing(fd, buffer_sdl, render, data_sf);
 	do {
 		SDL_Event event;
 		while (SDL_PollEvent(&event))
