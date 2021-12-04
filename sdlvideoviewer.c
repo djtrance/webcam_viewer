@@ -70,7 +70,6 @@ struct buffer
 	size_t length;
 };
 
-static char *dev_name = NULL;
 static io_method io = IO_METHOD_MMAP;
 struct buffer *buffers = NULL;
 static unsigned int n_buffers = 0;
@@ -441,7 +440,7 @@ static void init_read(unsigned int buffer_size)
 	}
 }
 
-static void init_mmap(int fd)
+static void init_mmap(int fd, char *dev_name)
 {
 	struct v4l2_requestbuffers req;
 
@@ -493,7 +492,7 @@ static void init_mmap(int fd)
 	}
 }
 
-static void init_userp(int fd, unsigned int buffer_size)
+static void init_userp(int fd, char *dev_name, unsigned int buffer_size)
 {
 	struct v4l2_requestbuffers req;
 	long page_size;
@@ -535,7 +534,7 @@ static void init_userp(int fd, unsigned int buffer_size)
 	}
 }
 
-static void init_device(int fd)
+static void init_device(int fd, char *dev_name)
 {
 	struct v4l2_capability cap;
 	struct v4l2_cropcap cropcap;
@@ -629,10 +628,10 @@ static void init_device(int fd)
 		init_read(fmt.fmt.pix.sizeimage);
 		break;
 	case IO_METHOD_MMAP:
-		init_mmap(fd);
+		init_mmap(fd, dev_name);
 		break;
 	case IO_METHOD_USERPTR:
-		init_userp(fd, fmt.fmt.pix.sizeimage);
+		init_userp(fd, dev_name, fmt.fmt.pix.sizeimage);
 		break;
 	}
 }
@@ -644,7 +643,7 @@ static void close_device(int *fd)
 	*fd = -1;
 }
 
-static int open_device(void)
+static int open_device(char *dev_name)
 {
 	struct stat st;
 	int fd;
@@ -706,7 +705,7 @@ static int sdl_filter(const SDL_Event * event)
 int main(int argc, char **argv)
 {
 	int fd = -1;
-	dev_name = "/dev/video0";
+	char *dev_name = "/dev/video0";
 
 	for (;;) {
 		int index;
@@ -749,8 +748,8 @@ int main(int argc, char **argv)
 
 	generate_YCbCr_to_RGB_lookup();
 
-	fd = open_device();
-	init_device(fd);
+	fd = open_device(dev_name);
+	init_device(fd, dev_name);
 
 	atexit(SDL_Quit);
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
