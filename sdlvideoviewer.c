@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2012 by Tomasz Moń <desowin@gmail.com>
  *
  * compile with:
@@ -77,7 +77,9 @@ static unsigned int n_buffers = 0;
 
 static size_t WIDTH = 640;
 static size_t HEIGHT = 480;
+#ifdef TRACK_COLOR
 static void track_color(const void *p);
+#endif
 
 static uint8_t *buffer_sdl;
 SDL_Surface *data_sf;
@@ -89,7 +91,7 @@ static void errno_exit(const char *s)
 	exit(EXIT_FAILURE);
 }
 
-static int xioctl(int fd, int request, void *arg)
+static int xioctl(int fd, unsigned long request, void *arg)
 {
 	int r;
 
@@ -121,7 +123,7 @@ void YCbCrToRGB(int y, int cb, int cr, uint8_t * r, uint8_t * g, uint8_t * b)
 	*b = max(0, min(255, B));
 }
 
-/* 
+/*
  * YCbCr to RGB lookup table
  *
  * Indexes are [Y][Cb][Cr]
@@ -173,7 +175,7 @@ static void generate_YCbCr_to_RGB_lookup()
  *  output is pointer to 24 bit RGB buffer.
  *  Output data is written in following order: R1, G1, B1, R2, G2, B2.
  */
-static void inline YUV422_to_RGB(uint8_t * output, const uint8_t * input)
+static inline void YUV422_to_RGB(uint8_t * output, const uint8_t * input)
 {
 	uint8_t y0 = input[0];
 	uint8_t cb = input[1];
@@ -202,11 +204,13 @@ static void process_image(const void *p)
 		for (x = 0; x < WIDTH; x += 2)
 			YUV422_to_RGB(buffer_sdl + (y * WIDTH + x) * 3,
 					  buffer_yuv + (y * WIDTH + x) * 2);
-
-	//    track_color(&buffer_yuv);
+#ifdef TRACK_COLOR
+	track_color(&buffer_yuv);
+#endif
 	render(data_sf);
 }
 
+#ifdef TRACK_COLOR
 static void  track_color(const void *p)
 {
 	size_t x;
@@ -220,6 +224,7 @@ static void  track_color(const void *p)
 
 	render(data_sf);
 }
+#endif
 
 static int read_frame(int fd)
 {
@@ -663,7 +668,7 @@ static int open_device(void)
 	return fd;
 }
 
-static void usage(FILE * fp, int argc, char **argv)
+static void usage(FILE * fp, __attribute__((unused)) int argc, char **argv)
 {
 	fprintf(fp,
 		"Usage: %s [options]\n\n"
